@@ -106,7 +106,7 @@ export function useEmotionDetection() {
       
       // Fallback to mock emotion detection (for demo/testing)
       console.log('Using mock emotion detection');
-      const emotion = analyzeEmotionFromLandmarks(null);
+      const emotion = generateMockEmotion();
       
       const result: EmotionResult = {
         emotion: emotion.dominant,
@@ -130,17 +130,14 @@ export function useEmotionDetection() {
     }
   }
 
-  // Simplified emotion analysis from facial landmarks
-  // This is a placeholder - in production, use a proper ML model
-  function analyzeEmotionFromLandmarks(_landmarks: any): {
+  // Generate mock emotion for demo/testing
+  function generateMockEmotion(): {
     dominant: EmotionType;
     confidence: number;
     expressions: Record<string, number>;
   } {
-    // Very simplified emotion detection based on landmark positions
-    // This would need to be replaced with a proper emotion classification model
-    
-    // For now, return random emotion with varying confidence (placeholder)
+    // Mock emotion detection for demo purposes
+    // In production, replace with proper ML model (FER2013, DeepFace, etc.)
     const emotions: EmotionType[] = ['happy', 'sad', 'angry', 'surprised', 'fearful', 'disgusted', 'neutral'];
     const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)] as EmotionType;
     const confidence = 0.6 + Math.random() * 0.3; // 60-90% confidence
@@ -159,6 +156,19 @@ export function useEmotionDetection() {
       confidence,
       expressions
     };
+  }
+
+  // Analyze emotion from facial landmarks
+  // This is a placeholder - in production, use a proper ML model
+  function analyzeEmotionFromLandmarks(landmarks: any): {
+    dominant: EmotionType;
+    confidence: number;
+    expressions: Record<string, number>;
+  } {
+    // TODO: Implement real emotion classification using landmarks
+    // For now, use mock data
+    console.log('Analyzing landmarks:', landmarks ? 'available' : 'not available');
+    return generateMockEmotion();
   }
 
   // Detect emotion from video stream (real-time)

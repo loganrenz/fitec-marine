@@ -2,15 +2,18 @@
 import { ref, onUnmounted, inject } from 'vue';
 import { useEmotionDetection } from '@/composables/useEmotionDetection';
 
+// Define injection key type
+type EmotionDetectionType = ReturnType<typeof useEmotionDetection>;
+
 const emit = defineEmits<{
   close: [];
   'emotion-detected': [];
 }>();
 
-// Use the emotion detection instance from App
-const emotionDetection = inject('emotionDetection') as ReturnType<typeof useEmotionDetection> | undefined;
+// Use the emotion detection instance from App (with proper type safety)
+const emotionDetection = inject<EmotionDetectionType>('emotionDetection');
 
-// Fallback to creating new instance if not provided
+// Fallback to creating new instance if not provided (should not happen in normal flow)
 const detection = emotionDetection || useEmotionDetection();
 
 const showSourceModal = ref(true);
