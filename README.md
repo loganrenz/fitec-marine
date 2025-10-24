@@ -1,5 +1,6 @@
 # Randos
 
+
 A monorepo collection of self-contained, single-page web applications for random fun activities, unified under a Vue 3 shell application.
 
 ## 🎯 Overview
