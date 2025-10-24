@@ -93,7 +93,7 @@
         // Global variables
         let modelsLoaded = false;
         let videoStream = null;
-        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights/';
 
         // Emotion to music mapping
         const emotionMusicMap = {
@@ -208,6 +208,7 @@
         async function loadModels() {
             try {
                 statusDiv.textContent = 'Loading AI models... This may take a moment.';
+                console.log('Loading models from:', MODEL_URL);
                 
                 // Load models from CDN
                 await Promise.all([
@@ -217,11 +218,13 @@
                 
                 modelsLoaded = true;
                 statusDiv.textContent = 'Ready! Click the button to get started.';
+                statusDiv.style.background = '#e3f2fd';
+                statusDiv.style.color = '#1976d2';
                 selectImageBtn.disabled = false;
                 console.log('Face-api.js models loaded successfully');
             } catch (error) {
                 console.error('Error loading models:', error);
-                statusDiv.textContent = 'Error loading models. Please refresh the page.';
+                statusDiv.textContent = 'Error loading models: ' + error.message + '. Please refresh.';
                 statusDiv.style.background = '#ffebee';
                 statusDiv.style.color = '#c62828';
             }
@@ -366,13 +369,22 @@
             }
 
             statusDiv.textContent = 'Analyzing your emotion...';
+            statusDiv.style.background = '#e3f2fd';
+            statusDiv.style.color = '#1976d2';
             resultsDiv.classList.add('hidden');
 
             try {
+                // Add timeout to prevent indefinite hanging
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Analysis timeout')), 30000)
+                );
+                
                 // Detect face and expressions
-                const detections = await faceapi
+                const detectionPromise = faceapi
                     .detectSingleFace(img, new faceapi.SsdMobilenetv1Options())
                     .withFaceExpressions();
+                
+                const detections = await Promise.race([detectionPromise, timeoutPromise]);
 
                 if (!detections) {
                     statusDiv.textContent = 'No face detected. Please try another image.';
@@ -404,7 +416,11 @@
 
             } catch (error) {
                 console.error('Error analyzing image:', error);
-                statusDiv.textContent = 'Error analyzing image. Please try again.';
+                if (error.message === 'Analysis timeout') {
+                    statusDiv.textContent = 'Analysis timed out. The models may not have loaded properly. Please refresh and try again.';
+                } else {
+                    statusDiv.textContent = 'Error analyzing image: ' + error.message;
+                }
                 statusDiv.style.background = '#ffebee';
                 statusDiv.style.color = '#c62828';
                 selectImageBtn.classList.remove('hidden');
