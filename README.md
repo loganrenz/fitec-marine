@@ -80,13 +80,17 @@ npm run build  # Build for production
 ```
 
 ### Individual Apps
-The original apps in `/apps/dice-roller` and `/apps/coin-flip` can still be opened directly in a browser. The emotion-music app requires building:
+The original apps in `/apps/` are preserved in their source directories:
+- `/apps/dice-roller` and `/apps/coin-flip` - Simple HTML/CSS/JS apps that can be opened directly in a browser
+- `/apps/emotion-music` - A Vue 3 application that requires building:
 
 ```bash
 cd apps/emotion-music
 npm install
-npm run build
+npm run build  # Build output goes to dist/
 ```
+
+**Note:** The shell app automatically includes pre-built versions of all apps in its `public/apps/` directory. During development, if you make changes to an original app, you'll need to manually copy it to the shell's public directory and rebuild.
 
 ## 🎨 Adding New Apps
 
@@ -96,8 +100,9 @@ To add a new app:
 1. Create a new directory under `/apps/` with your app name
 2. Add your `index.html` and any necessary JavaScript/CSS files
 3. Copy your app to `apps/shell/public/apps/<your-app-name>/`
+   - If your app has absolute paths (like `/assets/...`), update them to relative paths (like `./assets/...`)
 4. Add an entry in `apps/shell/src/views/Home.vue` to list your app
-5. Rebuild the shell app
+5. Rebuild the shell app with `npm run build`
 
 ### Option 2: Vue Component (Recommended for new apps)
 1. Create a new Vue component in `apps/shell/src/components/`
