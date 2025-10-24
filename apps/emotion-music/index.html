@@ -6,6 +6,8 @@
     <title>Emotion Music Recommender</title>
     <!-- face-api.js bundled with TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <!-- MusicKit JS v3 for Apple Music integration -->
+    <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" data-web-components async></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);padding:2rem;display:flex;justify-content:center;align-items:center}
@@ -16,6 +18,9 @@
         .main-button{width:100%;padding:1rem;background:#667eea;color:white;border:none;border-radius:12px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s;margin-bottom:1rem}
         .main-button:hover{background:#764ba2;transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
         .main-button:disabled{background:#ccc;cursor:not-allowed;transform:none}
+        .auth-button{padding:0.75rem;background:#007aff;color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin:0.5rem 0;transition:background 0.2s}
+        .auth-button:hover{background:#0056cc}
+        .auth-button:disabled{background:#ccc;cursor:not-allowed}
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-end;justify-content:center;padding:0}
         .modal.active{display:flex}
         .modal-content{background:white;border-radius:20px 20px 0 0;width:100%;max-width:600px;animation:slideUp 0.3s ease-out}
@@ -44,6 +49,10 @@
         .song-info{flex:1}
         .song-title{font-weight:600;color:#333;margin-bottom:0.1rem}
         .song-artist{font-size:0.9rem;color:#666}
+        .play-btn{padding:0.5rem 1rem;background:#007aff;color:white;border:none;border-radius:6px;font-size:0.9rem;cursor:pointer;margin-left:auto;transition:background 0.2s}
+        .play-btn:hover{background:#0056cc}
+        .playlist-info{text-align:center;margin-bottom:1rem}
+        .playlist-artwork{max-width:200px;height:auto;border-radius:8px}
         .back-link{display:block;text-align:center;margin-top:2rem;color:#667eea;text-decoration:none;font-weight:500}
         .back-link:hover{text-decoration:underline}
         input[type="file"]{display:none}
@@ -57,6 +66,11 @@
         <div id="status" class="status">Initializing AI models...</div>
        
         <button id="selectImageBtn" class="main-button" disabled>Select Image</button>
+        <div id="authSection" class="hidden">
+            <button id="authorizeBtn" class="auth-button">Authorize Apple Music</button>
+            <button id="unauthorizeBtn" class="auth-button hidden">Unauthorize</button>
+            <p style="font-size:0.8rem;color:#666;margin-top:0.5rem">Connect to play songs directly</p>
+        </div>
        
         <!-- Webcam view -->
         <div id="webcamContainer" class="webcam-container hidden">
@@ -84,16 +98,27 @@
     </div>
     <input type="file" id="fileInput" accept="image/*">
     <script>
+        // === SETUP INSTRUCTIONS ===
+        // 1. Join Apple Developer Program ($99/year).
+        // 2. Create MusicKit Identifier in Certificates, Identifiers & Profiles.
+        // 3. Generate private key (.p8) for MusicKit.
+        // 4. Use Node.js to generate JWT developerToken (see tutorial: https://areknawo.com/apple-music-javascript-integration-guide/).
+        // 5. Paste token below.
+        const DEVELOPER_TOKEN = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg5Nzg2NFE5WTQifQ.eyJpc3MiOiJGVlNZN0NGQzNTIiwiaWF0IjoxNzYxMjgyNDM2LCJleHAiOjE3NzY4MzQ0MzZ9.-Dl1DK9Ce39KY07ts_ZLBuGb8TLJd1M_AfCYNQsIGoIUuDcJdqlZMe9HxOOvkbWPhi5BIGWdZHvXmacelrjsvg'; // Replace with your JWT
+        const STOREFRONT = 'us'; // Change to your storefront country code if needed (e.g., 'gb')
+
         // Global variables
         let modelsLoaded = false;
+        let musicKit = null;
         let videoStream = null;
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-        // Emotion to music mapping
+        // Emotion to music mapping - now with search queries for Apple Music
         const emotionMusicMap = {
             happy: {
                 vibe: 'Upbeat & Energetic',
                 icon: '😊',
-                songs: [
+                searchQuery: 'upbeat energetic playlist',
+                fallbackSongs: [
                     { title: 'Happy', artist: 'Pharrell Williams', icon: '🎉' },
                     { title: 'Walking on Sunshine', artist: 'Katrina and the Waves', icon: '☀️' },
                     { title: 'Don\'t Stop Me Now', artist: 'Queen', icon: '⚡' },
@@ -104,7 +129,8 @@
             sad: {
                 vibe: 'Calm & Reflective',
                 icon: '😢',
-                songs: [
+                searchQuery: 'calm reflective playlist',
+                fallbackSongs: [
                     { title: 'Someone Like You', artist: 'Adele', icon: '🌧️' },
                     { title: 'The Night We Met', artist: 'Lord Huron', icon: '🌙' },
                     { title: 'Hurt', artist: 'Johnny Cash', icon: '💔' },
@@ -115,18 +141,20 @@
             angry: {
                 vibe: 'Intense & Powerful',
                 icon: '😠',
-                songs: [
+                searchQuery: 'intense powerful rock playlist',
+                fallbackSongs: [
                     { title: 'Break Stuff', artist: 'Limp Bizkit', icon: '🔥' },
                     { title: 'Killing in the Name', artist: 'Rage Against the Machine', icon: '⚡' },
                     { title: 'Bodies', artist: 'Drowning Pool', icon: '💥' },
                     { title: 'Last Resort', artist: 'Papa Roach', icon: '🎸' },
-                    { title: 'Chop Suey!', artist: 'System of the Down', icon: '🤘' }
+                    { title: 'Chop Suey!', artist: 'System of a Down', icon: '🤘' }
                 ]
             },
             surprised: {
                 vibe: 'Unexpected & Fun',
                 icon: '😲',
-                songs: [
+                searchQuery: 'fun upbeat pop playlist',
+                fallbackSongs: [
                     { title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars', icon: '🎺' },
                     { title: 'September', artist: 'Earth, Wind & Fire', icon: '🎉' },
                     { title: 'Mr. Blue Sky', artist: 'Electric Light Orchestra', icon: '☀️' },
@@ -137,7 +165,8 @@
             fearful: {
                 vibe: 'Soothing & Comforting',
                 icon: '😨',
-                songs: [
+                searchQuery: 'soothing comforting chill playlist',
+                fallbackSongs: [
                     { title: 'Weightless', artist: 'Marconi Union', icon: '🌊' },
                     { title: 'Breathe Me', artist: 'Sia', icon: '🌙' },
                     { title: 'Fix You', artist: 'Coldplay', icon: '⭐' },
@@ -148,7 +177,8 @@
             disgusted: {
                 vibe: 'Alternative & Edgy',
                 icon: '🤢',
-                songs: [
+                searchQuery: 'alternative edgy rock playlist',
+                fallbackSongs: [
                     { title: 'Smells Like Teen Spirit', artist: 'Nirvana', icon: '🎸' },
                     { title: 'Bitter Sweet Symphony', artist: 'The Verve', icon: '🎻' },
                     { title: 'Creep', artist: 'Radiohead', icon: '🌑' },
@@ -159,7 +189,8 @@
             neutral: {
                 vibe: 'Chill & Easy Listening',
                 icon: '😐',
-                songs: [
+                searchQuery: 'chill easy listening playlist',
+                fallbackSongs: [
                     { title: 'Riptide', artist: 'Vance Joy', icon: '🌊' },
                     { title: 'Budapest', artist: 'George Ezra', icon: '🎵' },
                     { title: 'Ho Hey', artist: 'The Lumineers', icon: '🎸' },
@@ -171,6 +202,9 @@
         // DOM elements
         const statusDiv = document.getElementById('status');
         const selectImageBtn = document.getElementById('selectImageBtn');
+        const authSection = document.getElementById('authSection');
+        const authorizeBtn = document.getElementById('authorizeBtn');
+        const unauthorizeBtn = document.getElementById('unauthorizeBtn');
         const modal = document.getElementById('modal');
         const takePhotoBtn = document.getElementById('takePhotoBtn');
         const chooseFileBtn = document.getElementById('chooseFileBtn');
@@ -182,18 +216,82 @@
         const captureBtn = document.getElementById('captureBtn');
         const stopCameraBtn = document.getElementById('stopCameraBtn');
         const resultsDiv = document.getElementById('results');
-        // Initialize TensorFlow.js with WASM backend
+        // Initialize TensorFlow.js with WebGL backend
         async function initTensorFlow() {
             try {
-                await faceapi.tf.setBackend('wasm');
+                await faceapi.tf.setBackend('webgl');
                 await faceapi.tf.ready();
-                console.log('TensorFlow.js WASM backend initialized');
+                console.log('TensorFlow.js WebGL backend initialized');
                 return true;
             } catch (error) {
                 console.error('Error initializing TensorFlow.js:', error);
                 return false;
             }
         }
+        // Setup MusicKit v3
+        async function setupMusicKit() {
+            if (DEVELOPER_TOKEN === 'PASTE_YOUR_DEVELOPER_TOKEN_HERE') {
+                console.warn('Please set your DEVELOPER_TOKEN');
+                authSection.classList.add('hidden');
+                return null;
+            }
+            return new Promise((resolve) => {
+                const handler = async () => {
+                    document.removeEventListener('musickitloaded', handler);
+                    try {
+                        await MusicKit.configure({
+                            developerToken: DEVELOPER_TOKEN,
+                            app: {
+                                name: 'Emotion Music Recommender',
+                                build: '1.0.0'
+                            }
+                        });
+                        musicKit = MusicKit.getInstance();
+                        updateAuthUI();
+                        authSection.classList.remove('hidden');
+                        resolve(musicKit);
+                    } catch (error) {
+                        console.error('MusicKit configure error:', error);
+                        resolve(null);
+                    }
+                };
+                if (document.readyState === 'complete' && window.MusicKit) {
+                    handler();
+                } else {
+                    document.addEventListener('musickitloaded', handler);
+                }
+            });
+        }
+        function updateAuthUI() {
+            if (musicKit && musicKit.isAuthorized) {
+                authorizeBtn.classList.add('hidden');
+                unauthorizeBtn.classList.remove('hidden');
+            } else {
+                authorizeBtn.classList.remove('hidden');
+                unauthorizeBtn.classList.add('hidden');
+            }
+        }
+        authorizeBtn.addEventListener('click', async () => {
+            if (!musicKit) return;
+            try {
+                await musicKit.authorize();
+                updateAuthUI();
+            } catch (error) {
+                console.error('Auth error:', error);
+                statusDiv.textContent = 'Apple Music authorization failed.';
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+            }
+        });
+        unauthorizeBtn.addEventListener('click', async () => {
+            if (!musicKit) return;
+            try {
+                await musicKit.unauthorize();
+                updateAuthUI();
+            } catch (error) {
+                console.error('Unauth error:', error);
+            }
+        });
         // Load face-api.js models
         async function loadModels() {
             try {
@@ -238,6 +336,7 @@
             const tfReady = await initTensorFlow();
             if (tfReady) {
                 await loadModels();
+                await setupMusicKit(); // Setup after models
             } else {
                 statusDiv.textContent = 'Error initializing TensorFlow. Please refresh.';
                 statusDiv.style.background = '#ffebee';
@@ -397,8 +496,25 @@
                 selectImageBtn.classList.remove('hidden');
             }
         }
+        // Search Apple Music for playlist using v3 passthrough API
+        async function searchPlaylist(query) {
+            if (!musicKit || !musicKit.isAuthorized) return null;
+            try {
+                const response = await musicKit.api.music(`/v1/catalog/${STOREFRONT}/search`, {
+                    params: {
+                        term: query,
+                        types: 'playlists',
+                        limit: 1
+                    }
+                });
+                return response.playlists?.data[0];
+            } catch (error) {
+                console.error('Search error:', error);
+                return null;
+            }
+        }
         // Display emotion and music recommendations
-        function displayResults(emotion, confidence) {
+        async function displayResults(emotion, confidence) {
             const musicData = emotionMusicMap[emotion] || emotionMusicMap.neutral;
             const confidencePercent = (confidence * 100).toFixed(1);
             let html = `
@@ -409,25 +525,57 @@
                 </div>
                 <div class="recommendations">
                     <h3>🎧 Your ${musicData.vibe} Playlist</h3>
-                    <ul class="song-list">
             `;
-            musicData.songs.forEach(song => {
+            const playlist = await searchPlaylist(musicData.searchQuery);
+            if (playlist) {
+                const artworkUrl = playlist.attributes.artwork?.url?.replace('{w}', '200').replace('{h}', '200');
                 html += `
-                    <li class="song-item">
-                        <span class="song-icon">${song.icon}</span>
-                        <div class="song-info">
-                            <div class="song-title">${song.title}</div>
-                            <div class="song-artist">${song.artist}</div>
-                        </div>
-                    </li>
+                    <div class="playlist-info">
+                        <img src="${artworkUrl}" alt="${playlist.attributes.name}" class="playlist-artwork">
+                        <h4>${playlist.attributes.name}</h4>
+                        <button class="play-btn" onclick="playPlaylist('${playlist.id}')">▶️ Play Playlist</button>
+                    </div>
                 `;
-            });
+            } else {
+                // Fallback to static songs with Apple Music search links
+                html += `
+                    <p style="color:#666;font-style:italic;">Authorize Apple Music for personalized playback, or search these on Apple Music:</p>
+                    <ul class="song-list">
+                `;
+                musicData.fallbackSongs.forEach(song => {
+                    const searchTerm = encodeURIComponent(`${song.title} ${song.artist}`);
+                    html += `
+                        <li class="song-item">
+                            <span class="song-icon">${song.icon}</span>
+                            <div class="song-info">
+                                <div class="song-title">${song.title}</div>
+                                <div class="song-artist">${song.artist}</div>
+                            </div>
+                            <a href="https://music.apple.com/search?term=${searchTerm}" target="_blank" class="play-btn">Search</a>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+            }
             html += `
-                    </ul>
                 </div>
             `;
             resultsDiv.innerHTML = html;
             resultsDiv.classList.remove('hidden');
+        }
+        // Global play function for playlist
+        async function playPlaylist(playlistId) {
+            if (!musicKit || !musicKit.isAuthorized) {
+                alert('Please authorize Apple Music first.');
+                return;
+            }
+            try {
+                await musicKit.setQueue({ playlist: playlistId });
+                await musicKit.play();
+            } catch (error) {
+                console.error('Playback error:', error);
+                alert('Playback failed. Ensure you have Apple Music subscription.');
+            }
         }
     </script>
 </body>
