@@ -227,8 +227,19 @@
             }
         }
 
-        // Initialize on page load
-        (async () => {
+        // Wait for external libraries to load, then initialize
+        async function initialize() {
+            // Check if libraries are loaded, retry if not
+            if (typeof tf === 'undefined' || typeof faceapi === 'undefined') {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (typeof tf === 'undefined' || typeof faceapi === 'undefined') {
+                    statusDiv.textContent = 'Error loading AI libraries. Please refresh.';
+                    statusDiv.style.background = '#ffebee';
+                    statusDiv.style.color = '#c62828';
+                    return;
+                }
+            }
+            
             const tfReady = await initTensorFlow();
             if (tfReady) {
                 await loadModels();
@@ -237,7 +248,14 @@
                 statusDiv.style.background = '#ffebee';
                 statusDiv.style.color = '#c62828';
             }
-        })();
+        }
+        
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
 
         // Modal controls
         selectImageBtn.addEventListener('click', () => {
