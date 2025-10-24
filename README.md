@@ -1,25 +1,33 @@
 # Randos
 
-A monorepo collection of self-contained, single-page web applications for random fun activities.
+A monorepo collection of self-contained, single-page web applications for random fun activities, unified under a Vue 3 shell application.
 
 ## 🎯 Overview
 
-This repository hosts a collection of lightweight, interactive web apps. Each app is completely self-contained and can run independently without any build process or dependencies.
+This repository hosts a collection of lightweight, interactive web apps. All apps are served through a Vue 3 shell application that provides a unified interface and navigation.
 
 ## 📁 Structure
 
 ```
 /
-├── index.html          # Homepage with links to all apps
+├── vercel.json              # Vercel deployment configuration
 ├── apps/
-│   ├── dice-roller/    # Dice rolling app
-│   │   ├── index.html
-│   │   └── script.js
-│   ├── coin-flip/      # Coin flipping app
-│   │   ├── index.html
-│   │   └── script.js
-│   └── emotion-music/  # Emotion-based music recommender
-│       └── index.html
+│   ├── shell/               # Vue 3 shell application (main entry point)
+│   │   ├── src/
+│   │   │   ├── components/  # IframeWrapper and other components
+│   │   │   ├── views/       # Home and RandoPage views
+│   │   │   ├── router/      # Vue Router configuration
+│   │   │   └── ...
+│   │   ├── public/
+│   │   │   └── apps/        # Static apps copied here during build
+│   │   │       ├── dice-roller/
+│   │   │       ├── coin-flip/
+│   │   │       └── emotion-music/
+│   │   └── package.json
+│   ├── dice-roller/         # Original dice rolling app
+│   ├── coin-flip/           # Original coin flipping app
+│   └── emotion-music/       # Original emotion-based music recommender (Vue app)
+└── index.html               # Legacy homepage (for reference)
 ```
 
 ## 🎲 Available Apps
@@ -46,16 +54,59 @@ An AI-powered music recommender that analyzes your facial expression and suggest
 
 ## 🚀 Deployment
 
-This repository is designed to be deployed on Vercel or any static hosting platform. Simply point your deployment to the root directory, and all apps will be accessible.
+This repository is deployed on Vercel. The `vercel.json` configuration builds the Vue shell app (`apps/shell`) and serves it as the main application.
+
+**Live Site:** https://randos-kappa.vercel.app/
+
+All apps are accessible at:
+- https://randos-kappa.vercel.app/ - Home page listing all apps
+- https://randos-kappa.vercel.app/r/dice-roller - Dice roller in the shell
+- https://randos-kappa.vercel.app/r/coin-flip - Coin flip in the shell
+- https://randos-kappa.vercel.app/r/emotion-music - Emotion music in the shell
+
+Or directly at:
+- https://randos-kappa.vercel.app/apps/dice-roller/index.html
+- https://randos-kappa.vercel.app/apps/coin-flip/index.html
+- https://randos-kappa.vercel.app/apps/emotion-music/index.html
 
 ## 💻 Local Development
 
-No build process required! Simply open `index.html` in your browser to get started, or open individual app `index.html` files directly.
+### Shell Application
+```bash
+cd apps/shell
+npm install
+npm run dev    # Start development server
+npm run build  # Build for production
+```
+
+### Individual Apps
+The original apps in `/apps/` are preserved in their source directories:
+- `/apps/dice-roller` and `/apps/coin-flip` - Simple HTML/CSS/JS apps that can be opened directly in a browser
+- `/apps/emotion-music` - A Vue 3 application that requires building:
+
+```bash
+cd apps/emotion-music
+npm install
+npm run build  # Build output goes to dist/
+```
+
+**Note:** The shell app automatically includes pre-built versions of all apps in its `public/apps/` directory. During development, if you make changes to an original app, you'll need to manually copy it to the shell's public directory and rebuild.
 
 ## 🎨 Adding New Apps
 
 To add a new app:
-1. Create a new directory under `/apps/`
+
+### Option 1: Simple Static App (Quick)
+1. Create a new directory under `/apps/` with your app name
 2. Add your `index.html` and any necessary JavaScript/CSS files
-3. Update the root `index.html` to link to your new app
-4. Keep apps self-contained and lightweight
+3. Copy your app to `apps/shell/public/apps/<your-app-name>/`
+   - If your app has absolute paths (like `/assets/...`), update them to relative paths (like `./assets/...`)
+4. Add an entry in `apps/shell/src/views/Home.vue` to list your app
+5. Rebuild the shell app with `npm run build`
+
+### Option 2: Vue Component (Recommended for new apps)
+1. Create a new Vue component in `apps/shell/src/components/`
+2. Add a route in `apps/shell/src/router/index.ts`
+3. Update the home page to link to your new app
+
+The shell provides an `IframeWrapper` component for quickly integrating existing static apps without refactoring.
