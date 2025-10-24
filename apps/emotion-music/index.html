@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Music Recommender</title>
+    <!-- face-api.js bundled with TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);padding:2rem;display:flex;justify-content:center;align-items:center}
+        .container{background:white;border-radius:20px;padding:2rem;max-width:600px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+        h1{color:#333;text-align:center;margin-bottom:0.5rem;font-size:2rem}
+        .subtitle{text-align:center;color:#666;margin-bottom:2rem;font-size:0.9rem}
+        .status{text-align:center;padding:0.75rem;margin-bottom:1rem;border-radius:8px;background:#e3f2fd;color:#1976d2;font-size:0.9rem}
+        .main-button{width:100%;padding:1rem;background:#667eea;color:white;border:none;border-radius:12px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s;margin-bottom:1rem}
+        .main-button:hover{background:#764ba2;transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
+        .main-button:disabled{background:#ccc;cursor:not-allowed;transform:none}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-end;justify-content:center;padding:0}
+        .modal.active{display:flex}
+        .modal-content{background:white;border-radius:20px 20px 0 0;width:100%;max-width:600px;animation:slideUp 0.3s ease-out}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        .modal-header{padding:1rem;text-align:center;font-weight:600;border-bottom:1px solid #eee;color:#666;font-size:0.9rem}
+        .modal-options{padding:0.5rem}
+        .modal-option{width:100%;padding:1rem;background:white;border:none;text-align:center;font-size:1.1rem;cursor:pointer;color:#007aff;transition:background 0.2s;border-bottom:1px solid #eee}
+        .modal-option:hover{background:#f5f5f5}
+        .modal-option.cancel{color:#ff3b30;font-weight:600;border-bottom:none;margin-top:0.5rem;border-radius:12px}
+        .hidden{display:none!important}
+        .webcam-container{position:relative;margin:1rem 0;border-radius:12px;overflow:hidden;background:#000}
+        #video{width:100%;display:block}
+        #canvas{display:none}
+        .capture-btn{width:100%;padding:1rem;background:#ff3b30;color:white;border:none;border-radius:12px;font-size:1.1rem;font-weight:600;cursor:pointer;margin-top:1rem}
+        .capture-btn:hover{background:#ff5247}
+        .results{margin-top:2rem}
+        .emotion-display{text-align:center;padding:1.5rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-radius:12px;margin-bottom:1.5rem}
+        .emotion-icon{font-size:4rem;margin-bottom:0.5rem}
+        .emotion-label{font-size:1.5rem;font-weight:600;margin-bottom:0.25rem}
+        .emotion-confidence{font-size:0.9rem;opacity:0.9}
+        .recommendations{background:#f5f5f5;border-radius:12px;padding:1.5rem}
+        .recommendations h3{color:#333;margin-bottom:1rem;font-size:1.2rem}
+        .song-list{list-style:none}
+        .song-item{padding:0.75rem;background:white;border-radius:8px;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem}
+        .song-icon{font-size:1.5rem}
+        .song-info{flex:1}
+        .song-title{font-weight:600;color:#333;margin-bottom:0.1rem}
+        .song-artist{font-size:0.9rem;color:#666}
+        .back-link{display:block;text-align:center;margin-top:2rem;color:#667eea;text-decoration:none;font-weight:500}
+        .back-link:hover{text-decoration:underline}
+        input[type="file"]{display:none}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Emotion Music</h1>
+        <p class="subtitle">Let your face choose the perfect playlist</p>
+       
+        <div id="status" class="status">Initializing AI models...</div>
+       
+        <button id="selectImageBtn" class="main-button" disabled>Select Image</button>
+       
+        <!-- Webcam view -->
+        <div id="webcamContainer" class="webcam-container hidden">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+        </div>
+        <button id="captureBtn" class="capture-btn hidden">Capture Photo</button>
+        <button id="stopCameraBtn" class="capture-btn hidden">Stop Camera</button>
+       
+        <!-- Results -->
+        <div id="results" class="results hidden"></div>
+       
+        <a href="../../index.html" class="back-link">← Back to Home</a>
+    </div>
+    <!-- iOS-style modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Choose Image Source</div>
+            <div class="modal-options">
+                <button class="modal-option" id="takePhotoBtn">📷 Take Photo</button>
+                <button class="modal-option" id="chooseFileBtn">🖼️ Choose from Library</button>
+                <button class="modal-option cancel" id="cancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+    <script>
+        // Global variables
+        let modelsLoaded = false;
+        let videoStream = null;
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+        // Emotion to music mapping
+        const emotionMusicMap = {
+            happy: {
+                vibe: 'Upbeat & Energetic',
+                icon: '😊',
+                songs: [
+                    { title: 'Happy', artist: 'Pharrell Williams', icon: '🎉' },
+                    { title: 'Walking on Sunshine', artist: 'Katrina and the Waves', icon: '☀️' },
+                    { title: 'Don\'t Stop Me Now', artist: 'Queen', icon: '⚡' },
+                    { title: 'Good as Hell', artist: 'Lizzo', icon: '💫' },
+                    { title: 'Can\'t Stop the Feeling', artist: 'Justin Timberlake', icon: '🎵' }
+                ]
+            },
+            sad: {
+                vibe: 'Calm & Reflective',
+                icon: '😢',
+                songs: [
+                    { title: 'Someone Like You', artist: 'Adele', icon: '🌧️' },
+                    { title: 'The Night We Met', artist: 'Lord Huron', icon: '🌙' },
+                    { title: 'Hurt', artist: 'Johnny Cash', icon: '💔' },
+                    { title: 'Mad World', artist: 'Gary Jules', icon: '🌊' },
+                    { title: 'Skinny Love', artist: 'Bon Iver', icon: '🍂' }
+                ]
+            },
+            angry: {
+                vibe: 'Intense & Powerful',
+                icon: '😠',
+                songs: [
+                    { title: 'Break Stuff', artist: 'Limp Bizkit', icon: '🔥' },
+                    { title: 'Killing in the Name', artist: 'Rage Against the Machine', icon: '⚡' },
+                    { title: 'Bodies', artist: 'Drowning Pool', icon: '💥' },
+                    { title: 'Last Resort', artist: 'Papa Roach', icon: '🎸' },
+                    { title: 'Chop Suey!', artist: 'System of the Down', icon: '🤘' }
+                ]
+            },
+            surprised: {
+                vibe: 'Unexpected & Fun',
+                icon: '😲',
+                songs: [
+                    { title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars', icon: '🎺' },
+                    { title: 'September', artist: 'Earth, Wind & Fire', icon: '🎉' },
+                    { title: 'Mr. Blue Sky', artist: 'Electric Light Orchestra', icon: '☀️' },
+                    { title: 'Dynamite', artist: 'BTS', icon: '💥' },
+                    { title: 'Levitating', artist: 'Dua Lipa', icon: '✨' }
+                ]
+            },
+            fearful: {
+                vibe: 'Soothing & Comforting',
+                icon: '😨',
+                songs: [
+                    { title: 'Weightless', artist: 'Marconi Union', icon: '🌊' },
+                    { title: 'Breathe Me', artist: 'Sia', icon: '🌙' },
+                    { title: 'Fix You', artist: 'Coldplay', icon: '⭐' },
+                    { title: 'Safe & Sound', artist: 'Capital Cities', icon: '🏡' },
+                    { title: 'The A Team', artist: 'Ed Sheeran', icon: '🎵' }
+                ]
+            },
+            disgusted: {
+                vibe: 'Alternative & Edgy',
+                icon: '🤢',
+                songs: [
+                    { title: 'Smells Like Teen Spirit', artist: 'Nirvana', icon: '🎸' },
+                    { title: 'Bitter Sweet Symphony', artist: 'The Verve', icon: '🎻' },
+                    { title: 'Creep', artist: 'Radiohead', icon: '🌑' },
+                    { title: 'Seven Nation Army', artist: 'The White Stripes', icon: '⚡' },
+                    { title: 'Boulevard of Broken Dreams', artist: 'Green Day', icon: '🛣️' }
+                ]
+            },
+            neutral: {
+                vibe: 'Chill & Easy Listening',
+                icon: '😐',
+                songs: [
+                    { title: 'Riptide', artist: 'Vance Joy', icon: '🌊' },
+                    { title: 'Budapest', artist: 'George Ezra', icon: '🎵' },
+                    { title: 'Ho Hey', artist: 'The Lumineers', icon: '🎸' },
+                    { title: 'Some Nights', artist: 'fun.', icon: '🌙' },
+                    { title: 'The Middle', artist: 'Zedd, Maren Morris & Grey', icon: '✨' }
+                ]
+            }
+        };
+        // DOM elements
+        const statusDiv = document.getElementById('status');
+        const selectImageBtn = document.getElementById('selectImageBtn');
+        const modal = document.getElementById('modal');
+        const takePhotoBtn = document.getElementById('takePhotoBtn');
+        const chooseFileBtn = document.getElementById('chooseFileBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const fileInput = document.getElementById('fileInput');
+        const webcamContainer = document.getElementById('webcamContainer');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('captureBtn');
+        const stopCameraBtn = document.getElementById('stopCameraBtn');
+        const resultsDiv = document.getElementById('results');
+        // Initialize TensorFlow.js with WASM backend
+        async function initTensorFlow() {
+            try {
+                await faceapi.tf.setBackend('wasm');
+                await faceapi.tf.ready();
+                console.log('TensorFlow.js WASM backend initialized');
+                return true;
+            } catch (error) {
+                console.error('Error initializing TensorFlow.js:', error);
+                return false;
+            }
+        }
+        // Load face-api.js models
+        async function loadModels() {
+            try {
+                statusDiv.textContent = 'Loading AI models... This may take a moment.';
+                console.log('Loading models from:', MODEL_URL);
+               
+                // Load models from CDN
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
+                ]);
+               
+                modelsLoaded = true;
+                statusDiv.textContent = 'Ready! Click the button to get started.';
+                statusDiv.style.background = '#e3f2fd';
+                statusDiv.style.color = '#1976d2';
+                selectImageBtn.disabled = false;
+                console.log('Face-api.js models loaded successfully');
+            } catch (error) {
+                console.error('Error loading models:', error);
+                statusDiv.textContent = 'Error loading models: ' + error.message + '. Please refresh.';
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+            }
+        }
+        // Wait for external libraries to load, then initialize
+        async function initialize() {
+            // Check if libraries are loaded, retry with exponential backoff
+            let retries = 0;
+            while ((typeof faceapi === 'undefined') && retries < 10) {
+                await new Promise(resolve => setTimeout(resolve, 100 * (retries + 1)));
+                retries++;
+            }
+           
+            if (typeof faceapi === 'undefined') {
+                statusDiv.textContent = 'Error loading AI libraries. Please refresh.';
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                return;
+            }
+           
+            const tfReady = await initTensorFlow();
+            if (tfReady) {
+                await loadModels();
+            } else {
+                statusDiv.textContent = 'Error initializing TensorFlow. Please refresh.';
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+            }
+        }
+       
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+        // Modal controls
+        selectImageBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+        // Take photo option - start webcam
+        takePhotoBtn.addEventListener('click', async () => {
+            modal.classList.remove('active');
+            await startWebcam();
+        });
+        // Choose file option
+        chooseFileBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            fileInput.click();
+        });
+        // File input handler
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const img = new Image();
+                    img.onload = async () => {
+                        await analyzeImage(img);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        // Start webcam
+        async function startWebcam() {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' },
+                    audio: false
+                });
+                video.srcObject = videoStream;
+                webcamContainer.classList.remove('hidden');
+                captureBtn.classList.remove('hidden');
+                stopCameraBtn.classList.remove('hidden');
+                selectImageBtn.classList.add('hidden');
+                statusDiv.textContent = 'Camera ready! Position your face and click capture.';
+            } catch (error) {
+                console.error('Error accessing webcam:', error);
+                statusDiv.textContent = 'Unable to access camera. Please try uploading an image.';
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+            }
+        }
+        // Stop webcam
+        function stopWebcam() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            webcamContainer.classList.add('hidden');
+            captureBtn.classList.add('hidden');
+            stopCameraBtn.classList.add('hidden');
+            selectImageBtn.classList.remove('hidden');
+        }
+        // Capture photo from webcam
+        captureBtn.addEventListener('click', async () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+           
+            stopWebcam();
+           
+            const img = new Image();
+            img.onload = async () => {
+                await analyzeImage(img);
+            };
+            img.src = canvas.toDataURL();
+        });
+        // Stop camera button
+        stopCameraBtn.addEventListener('click', () => {
+            stopWebcam();
+            statusDiv.textContent = 'Camera stopped. Click the button to try again.';
+        });
+        // Analyze image for emotions
+        async function analyzeImage(img) {
+            if (!modelsLoaded) {
+                statusDiv.textContent = 'Models not loaded yet. Please wait.';
+                return;
+            }
+            statusDiv.textContent = 'Analyzing your emotion...';
+            statusDiv.style.background = '#e3f2fd';
+            statusDiv.style.color = '#1976d2';
+            resultsDiv.classList.add('hidden');
+            try {
+                // Add timeout to prevent indefinite hanging
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Analysis timeout')), 30000)
+                );
+               
+                // Detect face and expressions
+                const detectionPromise = faceapi
+                    .detectSingleFace(img, new faceapi.SsdMobilenetv1Options())
+                    .withFaceExpressions();
+               
+                const detections = await Promise.race([detectionPromise, timeoutPromise]);
+                if (!detections) {
+                    statusDiv.textContent = 'No face detected. Please try another image.';
+                    statusDiv.style.background = '#fff3e0';
+                    statusDiv.style.color = '#e65100';
+                    selectImageBtn.classList.remove('hidden');
+                    return;
+                }
+                // Get dominant emotion
+                const expressions = detections.expressions;
+                let dominantEmotion = 'neutral';
+                let maxConfidence = 0;
+                Object.keys(expressions).forEach(emotion => {
+                    if (expressions[emotion] > maxConfidence) {
+                        maxConfidence = expressions[emotion];
+                        dominantEmotion = emotion;
+                    }
+                });
+                // Display results
+                displayResults(dominantEmotion, maxConfidence);
+               
+                statusDiv.textContent = 'Analysis complete!';
+                statusDiv.style.background = '#e8f5e9';
+                statusDiv.style.color = '#2e7d32';
+                selectImageBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error analyzing image:', error);
+                if (error.message === 'Analysis timeout') {
+                    statusDiv.textContent = 'Analysis timed out. The models may not have loaded properly. Please refresh and try again.';
+                } else {
+                    statusDiv.textContent = 'Error analyzing image: ' + error.message;
+                }
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                selectImageBtn.classList.remove('hidden');
+            }
+        }
+        // Display emotion and music recommendations
+        function displayResults(emotion, confidence) {
+            const musicData = emotionMusicMap[emotion] || emotionMusicMap.neutral;
+            const confidencePercent = (confidence * 100).toFixed(1);
+            let html = `
+                <div class="emotion-display">
+                    <div class="emotion-icon">${musicData.icon}</div>
+                    <div class="emotion-label">${emotion.charAt(0).toUpperCase() + emotion.slice(1)}</div>
+                    <div class="emotion-confidence">${confidencePercent}% confidence</div>
+                </div>
+                <div class="recommendations">
+                    <h3>🎧 Your ${musicData.vibe} Playlist</h3>
+                    <ul class="song-list">
+            `;
+            musicData.songs.forEach(song => {
+                html += `
+                    <li class="song-item">
+                        <span class="song-icon">${song.icon}</span>
+                        <div class="song-info">
+                            <div class="song-title">${song.title}</div>
+                            <div class="song-artist">${song.artist}</div>
+                        </div>
+                    </li>
+                `;
+            });
+            html += `
+                    </ul>
+                </div>
+            `;
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
