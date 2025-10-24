@@ -6,6 +6,10 @@ const diceDiv = document.getElementById('dice');
 // Dice face emojis
 const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
 
+// Animation constants
+const ANIMATION_CYCLES = 10;
+const ANIMATION_INTERVAL_MS = 100;
+
 function rollDice() {
     // Disable button during animation
     rollBtn.disabled = true;
@@ -17,7 +21,7 @@ function rollDice() {
         diceDiv.textContent = diceFaces[randomFace];
         count++;
         
-        if (count >= 10) {
+        if (count >= ANIMATION_CYCLES) {
             clearInterval(animationInterval);
             
             // Final roll
@@ -28,7 +32,7 @@ function rollDice() {
             // Re-enable button
             rollBtn.disabled = false;
         }
-    }, 100);
+    }, ANIMATION_INTERVAL_MS);
 }
 
 // Event listener

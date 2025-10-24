@@ -3,6 +3,9 @@ const flipBtn = document.getElementById('flipBtn');
 const resultDiv = document.getElementById('result');
 const coinDiv = document.getElementById('coin');
 
+// Animation duration in milliseconds (matches CSS animation)
+const ANIMATION_DURATION_MS = 600;
+
 function flipCoin() {
     // Disable button during animation
     flipBtn.disabled = true;
@@ -19,7 +22,7 @@ function flipCoin() {
         coinDiv.classList.remove('flipping');
         resultDiv.textContent = result;
         flipBtn.disabled = false;
-    }, 600);
+    }, ANIMATION_DURATION_MS);
 }
 
 // Event listener
