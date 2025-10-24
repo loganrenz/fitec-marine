@@ -229,15 +229,18 @@
 
         // Wait for external libraries to load, then initialize
         async function initialize() {
-            // Check if libraries are loaded, retry if not
+            // Check if libraries are loaded, retry with exponential backoff
+            let retries = 0;
+            while ((typeof tf === 'undefined' || typeof faceapi === 'undefined') && retries < 10) {
+                await new Promise(resolve => setTimeout(resolve, 100 * (retries + 1)));
+                retries++;
+            }
+            
             if (typeof tf === 'undefined' || typeof faceapi === 'undefined') {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                if (typeof tf === 'undefined' || typeof faceapi === 'undefined') {
-                    statusDiv.textContent = 'Error loading AI libraries. Please refresh.';
-                    statusDiv.style.background = '#ffebee';
-                    statusDiv.style.color = '#c62828';
-                    return;
-                }
+                statusDiv.textContent = 'Error loading AI libraries. Please refresh.';
+                statusDiv.style.background = '#ffebee';
+                statusDiv.style.color = '#c62828';
+                return;
             }
             
             const tfReady = await initTensorFlow();
