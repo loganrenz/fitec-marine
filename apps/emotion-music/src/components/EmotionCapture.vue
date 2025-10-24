@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue';
+import { ref, onUnmounted, inject } from 'vue';
 import { useEmotionDetection } from '@/composables/useEmotionDetection';
 
 const emit = defineEmits<{
@@ -7,7 +7,11 @@ const emit = defineEmits<{
   'emotion-detected': [];
 }>();
 
-const emotionDetection = useEmotionDetection();
+// Use the emotion detection instance from App
+const emotionDetection = inject('emotionDetection') as ReturnType<typeof useEmotionDetection> | undefined;
+
+// Fallback to creating new instance if not provided
+const detection = emotionDetection || useEmotionDetection();
 
 const showSourceModal = ref(true);
 const showWebcam = ref(false);
@@ -112,12 +116,12 @@ async function handleFileSelect(event: Event) {
 
 async function analyzeImage(img: HTMLImageElement) {
   try {
-    const result = await emotionDetection.detectFromImage(img);
+    const result = await detection.detectFromImage(img);
     
     if (result) {
       emit('emotion-detected');
     } else {
-      errorMessage.value = emotionDetection.error.value || 'No face detected. Please try another image.';
+      errorMessage.value = detection.error.value || 'No face detected. Please try another image.';
       isAnalyzing.value = false;
     }
   } catch (error) {

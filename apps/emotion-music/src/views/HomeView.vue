@@ -18,7 +18,8 @@ const statusMessage = ref('Initializing AI models...');
 const statusType = ref<'info' | 'success' | 'error' | 'warning'>('info');
 const showAuthSection = ref(false);
 
-const isReady = computed(() => emotionStore.modelsLoaded && musicKit.isReady.value);
+// Allow the app to work even if MusicKit fails to load
+const isReady = computed(() => emotionStore.modelsLoaded);
 
 onMounted(async () => {
   // Check if models are already loaded

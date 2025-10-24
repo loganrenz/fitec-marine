@@ -28,9 +28,14 @@ onMounted(async () => {
     return;
   }
 
-  // Search for playlists
-  if (emotionData.value && musicKit.isReady.value) {
-    await searchPlaylists();
+  // Search for playlists if MusicKit is ready, otherwise just show fallback songs
+  if (emotionData.value) {
+    if (musicKit.isReady.value) {
+      await searchPlaylists();
+    } else {
+      // Mark as complete to show fallback songs
+      searchComplete.value = true;
+    }
   }
 });
 

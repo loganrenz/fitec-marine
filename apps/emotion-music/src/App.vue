@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, provide } from 'vue';
 import { useEmotionDetection } from './composables/useEmotionDetection';
 import { useMusicKit } from './composables/useMusicKit';
 
 const emotionDetection = useEmotionDetection();
 const musicKit = useMusicKit();
+
+// Provide instances to child components
+provide('emotionDetection', emotionDetection);
+provide('musicKit', musicKit);
 
 onMounted(async () => {
   // Initialize ML models and MusicKit in parallel
