@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emotion Music Recommender</title>
-    <!-- TensorFlow.js with WASM backend -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.11.0/dist/tf-backend-wasm.min.js"></script>
-    <!-- face-api.js for face detection and emotion recognition -->
-    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <!-- face-api.js bundled with TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);padding:2rem;display:flex;justify-content:center;align-items:center}
@@ -56,11 +53,11 @@
     <div class="container">
         <h1>🎵 Emotion Music</h1>
         <p class="subtitle">Let your face choose the perfect playlist</p>
-        
+       
         <div id="status" class="status">Initializing AI models...</div>
-        
+       
         <button id="selectImageBtn" class="main-button" disabled>Select Image</button>
-        
+       
         <!-- Webcam view -->
         <div id="webcamContainer" class="webcam-container hidden">
             <video id="video" autoplay playsinline></video>
@@ -68,13 +65,12 @@
         </div>
         <button id="captureBtn" class="capture-btn hidden">Capture Photo</button>
         <button id="stopCameraBtn" class="capture-btn hidden">Stop Camera</button>
-        
+       
         <!-- Results -->
         <div id="results" class="results hidden"></div>
-        
+       
         <a href="../../index.html" class="back-link">← Back to Home</a>
     </div>
-
     <!-- iOS-style modal -->
     <div id="modal" class="modal">
         <div class="modal-content">
@@ -86,15 +82,12 @@
             </div>
         </div>
     </div>
-
     <input type="file" id="fileInput" accept="image/*">
-
     <script>
         // Global variables
         let modelsLoaded = false;
         let videoStream = null;
-        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights/';
-
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
         // Emotion to music mapping
         const emotionMusicMap = {
             happy: {
@@ -127,7 +120,7 @@
                     { title: 'Killing in the Name', artist: 'Rage Against the Machine', icon: '⚡' },
                     { title: 'Bodies', artist: 'Drowning Pool', icon: '💥' },
                     { title: 'Last Resort', artist: 'Papa Roach', icon: '🎸' },
-                    { title: 'Chop Suey!', artist: 'System of a Down', icon: '🤘' }
+                    { title: 'Chop Suey!', artist: 'System of the Down', icon: '🤘' }
                 ]
             },
             surprised: {
@@ -175,7 +168,6 @@
                 ]
             }
         };
-
         // DOM elements
         const statusDiv = document.getElementById('status');
         const selectImageBtn = document.getElementById('selectImageBtn');
@@ -190,12 +182,11 @@
         const captureBtn = document.getElementById('captureBtn');
         const stopCameraBtn = document.getElementById('stopCameraBtn');
         const resultsDiv = document.getElementById('results');
-
         // Initialize TensorFlow.js with WASM backend
         async function initTensorFlow() {
             try {
-                await tf.setBackend('wasm');
-                await tf.ready();
+                await faceapi.tf.setBackend('wasm');
+                await faceapi.tf.ready();
                 console.log('TensorFlow.js WASM backend initialized');
                 return true;
             } catch (error) {
@@ -203,19 +194,18 @@
                 return false;
             }
         }
-
         // Load face-api.js models
         async function loadModels() {
             try {
                 statusDiv.textContent = 'Loading AI models... This may take a moment.';
                 console.log('Loading models from:', MODEL_URL);
-                
+               
                 // Load models from CDN
                 await Promise.all([
                     faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
                     faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
                 ]);
-                
+               
                 modelsLoaded = true;
                 statusDiv.textContent = 'Ready! Click the button to get started.';
                 statusDiv.style.background = '#e3f2fd';
@@ -229,23 +219,22 @@
                 statusDiv.style.color = '#c62828';
             }
         }
-
         // Wait for external libraries to load, then initialize
         async function initialize() {
             // Check if libraries are loaded, retry with exponential backoff
             let retries = 0;
-            while ((typeof tf === 'undefined' || typeof faceapi === 'undefined') && retries < 10) {
+            while ((typeof faceapi === 'undefined') && retries < 10) {
                 await new Promise(resolve => setTimeout(resolve, 100 * (retries + 1)));
                 retries++;
             }
-            
-            if (typeof tf === 'undefined' || typeof faceapi === 'undefined') {
+           
+            if (typeof faceapi === 'undefined') {
                 statusDiv.textContent = 'Error loading AI libraries. Please refresh.';
                 statusDiv.style.background = '#ffebee';
                 statusDiv.style.color = '#c62828';
                 return;
             }
-            
+           
             const tfReady = await initTensorFlow();
             if (tfReady) {
                 await loadModels();
@@ -255,41 +244,35 @@
                 statusDiv.style.color = '#c62828';
             }
         }
-        
+       
         // Start initialization when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initialize);
         } else {
             initialize();
         }
-
         // Modal controls
         selectImageBtn.addEventListener('click', () => {
             modal.classList.add('active');
         });
-
         cancelBtn.addEventListener('click', () => {
             modal.classList.remove('active');
         });
-
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.classList.remove('active');
             }
         });
-
         // Take photo option - start webcam
         takePhotoBtn.addEventListener('click', async () => {
             modal.classList.remove('active');
             await startWebcam();
         });
-
         // Choose file option
         chooseFileBtn.addEventListener('click', () => {
             modal.classList.remove('active');
             fileInput.click();
         });
-
         // File input handler
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
@@ -305,13 +288,12 @@
                 reader.readAsDataURL(file);
             }
         });
-
         // Start webcam
         async function startWebcam() {
             try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ 
+                videoStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: 'user' },
-                    audio: false 
+                    audio: false
                 });
                 video.srcObject = videoStream;
                 webcamContainer.classList.remove('hidden');
@@ -326,7 +308,6 @@
                 statusDiv.style.color = '#c62828';
             }
         }
-
         // Stop webcam
         function stopWebcam() {
             if (videoStream) {
@@ -338,54 +319,48 @@
             stopCameraBtn.classList.add('hidden');
             selectImageBtn.classList.remove('hidden');
         }
-
         // Capture photo from webcam
         captureBtn.addEventListener('click', async () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0);
-            
+           
             stopWebcam();
-            
+           
             const img = new Image();
             img.onload = async () => {
                 await analyzeImage(img);
             };
             img.src = canvas.toDataURL();
         });
-
         // Stop camera button
         stopCameraBtn.addEventListener('click', () => {
             stopWebcam();
             statusDiv.textContent = 'Camera stopped. Click the button to try again.';
         });
-
         // Analyze image for emotions
         async function analyzeImage(img) {
             if (!modelsLoaded) {
                 statusDiv.textContent = 'Models not loaded yet. Please wait.';
                 return;
             }
-
             statusDiv.textContent = 'Analyzing your emotion...';
             statusDiv.style.background = '#e3f2fd';
             statusDiv.style.color = '#1976d2';
             resultsDiv.classList.add('hidden');
-
             try {
                 // Add timeout to prevent indefinite hanging
-                const timeoutPromise = new Promise((_, reject) => 
+                const timeoutPromise = new Promise((_, reject) =>
                     setTimeout(() => reject(new Error('Analysis timeout')), 30000)
                 );
-                
+               
                 // Detect face and expressions
                 const detectionPromise = faceapi
                     .detectSingleFace(img, new faceapi.SsdMobilenetv1Options())
                     .withFaceExpressions();
-                
+               
                 const detections = await Promise.race([detectionPromise, timeoutPromise]);
-
                 if (!detections) {
                     statusDiv.textContent = 'No face detected. Please try another image.';
                     statusDiv.style.background = '#fff3e0';
@@ -393,27 +368,23 @@
                     selectImageBtn.classList.remove('hidden');
                     return;
                 }
-
                 // Get dominant emotion
                 const expressions = detections.expressions;
                 let dominantEmotion = 'neutral';
                 let maxConfidence = 0;
-
                 Object.keys(expressions).forEach(emotion => {
                     if (expressions[emotion] > maxConfidence) {
                         maxConfidence = expressions[emotion];
                         dominantEmotion = emotion;
                     }
                 });
-
                 // Display results
                 displayResults(dominantEmotion, maxConfidence);
-                
+               
                 statusDiv.textContent = 'Analysis complete!';
                 statusDiv.style.background = '#e8f5e9';
                 statusDiv.style.color = '#2e7d32';
                 selectImageBtn.classList.remove('hidden');
-
             } catch (error) {
                 console.error('Error analyzing image:', error);
                 if (error.message === 'Analysis timeout') {
@@ -426,12 +397,10 @@
                 selectImageBtn.classList.remove('hidden');
             }
         }
-
         // Display emotion and music recommendations
         function displayResults(emotion, confidence) {
             const musicData = emotionMusicMap[emotion] || emotionMusicMap.neutral;
             const confidencePercent = (confidence * 100).toFixed(1);
-
             let html = `
                 <div class="emotion-display">
                     <div class="emotion-icon">${musicData.icon}</div>
@@ -442,7 +411,6 @@
                     <h3>🎧 Your ${musicData.vibe} Playlist</h3>
                     <ul class="song-list">
             `;
-
             musicData.songs.forEach(song => {
                 html += `
                     <li class="song-item">
@@ -454,12 +422,10 @@
                     </li>
                 `;
             });
-
             html += `
                     </ul>
                 </div>
             `;
-
             resultsDiv.innerHTML = html;
             resultsDiv.classList.remove('hidden');
         }
