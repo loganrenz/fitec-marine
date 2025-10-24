@@ -15,9 +15,11 @@ This repository hosts a collection of lightweight, interactive web apps. Each ap
 │   ├── dice-roller/    # Dice rolling app
 │   │   ├── index.html
 │   │   └── script.js
-│   └── coin-flip/      # Coin flipping app
-│       ├── index.html
-│       └── script.js
+│   ├── coin-flip/      # Coin flipping app
+│   │   ├── index.html
+│   │   └── script.js
+│   └── emotion-music/  # Emotion-based music recommender
+│       └── index.html
 ```
 
 ## 🎲 Available Apps
@@ -31,6 +33,16 @@ Roll a six-sided die and see what you get! Features an animated rolling effect.
 Flip a coin and see if it lands on heads or tails!
 - **Location:** `/apps/coin-flip/`
 - **Tech:** HTML, CSS, JavaScript
+
+### Emotion Music
+An AI-powered music recommender that analyzes your facial expression and suggests the perfect playlist!
+- **Location:** `/apps/emotion-music/`
+- **Tech:** HTML, JavaScript, TensorFlow.js, face-api.js
+- **Features:**
+  - Face detection and emotion recognition using AI
+  - Webcam capture or file upload
+  - Privacy-focused: all processing happens locally in your browser
+  - Music recommendations based on detected emotions (happy, sad, angry, etc.)
 
 ## 🚀 Deployment
 
