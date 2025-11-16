@@ -23,11 +23,13 @@ This repository hosts a collection of lightweight, interactive web apps. All app
 │   │   │   └── apps/        # Static apps copied here during build
 │   │   │       ├── dice-roller/
 │   │   │       ├── coin-flip/
-│   │   │       └── emotion-music/
+│   │   │       ├── emotion-music/
+│   │   │       └── fitec/
 │   │   └── package.json
 │   ├── dice-roller/         # Original dice rolling app
 │   ├── coin-flip/           # Original coin flipping app
-│   └── emotion-music/       # Original emotion-based music recommender (Vue app)
+│   ├── emotion-music/       # Original emotion-based music recommender (Vue app)
+│   └── fitec/               # FITEC gag site (whale suppositories)
 └── index.html               # Legacy homepage (for reference)
 ```
 
@@ -53,22 +55,43 @@ An AI-powered music recommender that analyzes your facial expression and suggest
   - Privacy-focused: all processing happens locally in your browser
   - Music recommendations based on detected emotions (happy, sad, angry, etc.)
 
+### FITEC
+A professional-looking gag site for a fictional company selling whale suppositories!
+- **Location:** `/apps/fitec/`
+- **Tech:** HTML, CSS (static site)
+- **Features:**
+  - Professional corporate design that looks like a real marine veterinary company
+  - Hilarious whale suppository product marketing
+  - Customer review from "Captain Tracy" sailing the Salty Dawg Rally
+  - Complete with OG images and proper meta tags for social sharing
+
 ## 🚀 Deployment
 
 This repository is deployed on Vercel. The `vercel.json` configuration builds the Vue shell app (`apps/shell`) and serves it as the main application.
 
 **Live Site:** https://randos-kappa.vercel.app/
 
+### Page Titles
+
+The shell application automatically sets appropriate page titles:
+- Home page: "Randos - Random Fun Web Apps"
+- Individual apps: "{App Name} - Randos" (e.g., "Dice Roller - Randos")
+- FITEC: "FITEC - Premium Whale Suppositories"
+
+Titles are managed via Vue Router and component lifecycle hooks for a seamless user experience.
+
 All apps are accessible at:
 - https://randos-kappa.vercel.app/ - Home page listing all apps
 - https://randos-kappa.vercel.app/r/dice-roller - Dice roller in the shell
 - https://randos-kappa.vercel.app/r/coin-flip - Coin flip in the shell
 - https://randos-kappa.vercel.app/r/emotion-music - Emotion music in the shell
+- https://randos-kappa.vercel.app/r/fitec - FITEC gag site in the shell
 
 Or directly at:
 - https://randos-kappa.vercel.app/apps/dice-roller/index.html
 - https://randos-kappa.vercel.app/apps/coin-flip/index.html
 - https://randos-kappa.vercel.app/apps/emotion-music/index.html
+- https://randos-kappa.vercel.app/apps/fitec/index.html
 
 ## 💻 Local Development
 
