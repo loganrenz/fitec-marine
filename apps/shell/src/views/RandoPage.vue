@@ -17,12 +17,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, watch } from 'vue'
 import IframeWrapper from '../components/IframeWrapper.vue'
 import { useRoute } from 'vue-router'
 
 // Apps that should hide the toolbar
 const HIDE_TOOLBAR_APPS = ['fitec']
+
+// App-specific titles
+const APP_TITLES: Record<string, string> = {
+  'dice-roller': 'Dice Roller - Randos',
+  'coin-flip': 'Coin Flip - Randos',
+  'emotion-music': 'Emotion Music - Randos',
+  'fitec': 'FITEC - Premium Whale Suppositories'
+}
 
 export default defineComponent({
   name: 'RandoPage',
@@ -37,6 +45,12 @@ export default defineComponent({
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
     })
+    
+    // Update document title when the app name changes
+    watch(name, (appName) => {
+      document.title = APP_TITLES[appName] || `${displayName.value} - Randos`
+    }, { immediate: true })
+    
     return { name, displayName, hideToolbar }
   }
 })
