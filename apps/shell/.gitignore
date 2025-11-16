@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Auto-generated during build - apps are copied from /apps/
+public/apps
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

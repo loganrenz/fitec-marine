@@ -20,11 +20,10 @@ This repository hosts a collection of lightweight, interactive web apps. All app
 │   │   │   ├── router/      # Vue Router configuration
 │   │   │   └── ...
 │   │   ├── public/
-│   │   │   └── apps/        # Static apps copied here during build
-│   │   │       ├── dice-roller/
-│   │   │       ├── coin-flip/
-│   │   │       ├── emotion-music/
-│   │   │       └── fitec/
+│   │   │   ├── apps/        # Auto-generated - apps copied here during build (gitignored)
+│   │   │   └── vite.svg
+│   │   ├── scripts/
+│   │   │   └── copy-apps.js # Build script to copy apps from /apps/
 │   │   └── package.json
 │   ├── dice-roller/         # Original dice rolling app
 │   ├── coin-flip/           # Original coin flipping app
@@ -95,13 +94,20 @@ Or directly at:
 
 ## 💻 Local Development
 
+### Single Source of Truth
+**Important:** All apps have a single source in `/apps/{app-name}/`. The shell's build process automatically copies apps to `apps/shell/public/apps/` - you should NEVER manually edit files in `public/apps/` as they are auto-generated and gitignored.
+
 ### Shell Application
 ```bash
 cd apps/shell
 npm install
-npm run dev    # Start development server
-npm run build  # Build for production
+npm run dev    # Copies apps and starts dev server
+npm run build  # Copies apps and builds for production
 ```
+
+The `copy-apps` script runs automatically before dev/build and:
+- Copies simple static apps directly from `/apps/`
+- Copies Vue apps from their `/apps/{name}/dist/` directories
 
 ### Individual Apps
 The original apps in `/apps/` are preserved in their source directories:
@@ -114,7 +120,7 @@ npm install
 npm run build  # Build output goes to dist/
 ```
 
-**Note:** The shell app automatically includes pre-built versions of all apps in its `public/apps/` directory. During development, if you make changes to an original app, you'll need to manually copy it to the shell's public directory and rebuild.
+**Note:** The shell app automatically copies apps from `/apps/` to `public/apps/` during the build process. The `copy-apps` script runs automatically as a prebuild step. You never need to manually copy apps - just edit the source in `/apps/` and rebuild.
 
 ## 🎨 Adding New Apps
 
