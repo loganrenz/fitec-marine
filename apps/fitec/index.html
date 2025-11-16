@@ -180,26 +180,12 @@
             text-align: center;
         }
 
-        .product-image .cylinder {
-            width: 150px;
-            height: 350px;
-            border-radius: 75px;
-            margin: 0 auto;
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            position: relative;
-            background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
-            border: 3px solid #e0e0e0;
-        }
-
-        .product-image .cylinder::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            border-radius: 65px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
         }
 
         .product-details {
@@ -396,7 +382,7 @@
             
             <div class="product-showcase">
                 <div class="product-image">
-                    <div class="cylinder"></div>
+                    <img src="https://github.com/user-attachments/assets/92bbc185-48a5-4343-bf44-659881ddf307" alt="White Cylindrical Whale Suppository">
                     <p style="margin-top: 1rem; color: #0077be; font-weight: bold;">Premium White Cylindrical Design</p>
                 </div>
                 
