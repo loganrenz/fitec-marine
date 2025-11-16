@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FITEC - Marine Wellness Solutions</title>
+    <title>FITEC Whale Suppositories | #1 in Cetacean Rectal Healthcare</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="FITEC Whale Suppositories | Premium Cetacean Healthcare">
+    <meta property="og:description" content="The #1 trusted name in whale suppository technology since 1987. Premium white cylindrical suppositories designed specifically for large marine mammals.">
+    <meta property="og:image" content="https://github.com/user-attachments/assets/a9b7f9c6-7779-456a-b920-98cf6f295cf1">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="FITEC Whale Suppositories | Premium Cetacean Healthcare">
+    <meta property="twitter:description" content="The #1 trusted name in whale suppository technology since 1987. Premium white cylindrical suppositories for large marine mammals.">
+    <meta property="twitter:image" content="https://github.com/user-attachments/assets/a9b7f9c6-7779-456a-b920-98cf6f295cf1">
+    
+    <!-- General Meta -->
+    <meta name="description" content="FITEC specializes in whale suppositories - premium white cylindrical suppositories designed for cetacean rectal medication delivery. The industry leader since 1987.">
+    <meta name="keywords" content="whale suppositories, cetacean healthcare, marine mammal medicine, FITEC">
+    
     <style>
         * {
             margin: 0;
@@ -17,246 +36,179 @@
             color: #333;
         }
 
-        /* Navigation */
-        nav {
-            background: linear-gradient(135deg, #0077be 0%, #005a8d 100%);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        nav .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        nav .logo {
-            color: white;
-            font-size: 2rem;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 2rem;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            transition: opacity 0.3s;
-        }
-
-        nav a:hover {
-            opacity: 0.8;
-        }
-
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, #0077be 0%, #00a8e8 100%);
             color: white;
-            padding: 6rem 2rem;
+            padding: 3rem 1.5rem;
             text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: clamp(2.5rem, 8vw, 5rem);
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 900;
+            line-height: 1.1;
         }
 
         .hero .tagline {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1rem, 3vw, 1.3rem);
             margin-bottom: 2rem;
             opacity: 0.95;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .hero .cta-button {
+        .product-image-hero {
+            max-width: 500px;
+            width: 90%;
+            margin: 2rem auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .product-image-hero img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+        }
+
+        .emphasis {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 900;
             display: inline-block;
+            margin: 0.2rem;
+        }
+
+        /* Product Info Section */
+        .product-info {
             background: white;
-            color: #0077be;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 3rem 1.5rem;
         }
 
-        .hero .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        /* Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
         }
 
-        /* Section Styles */
-        section {
-            padding: 5rem 2rem;
-        }
-
-        section h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #0077be;
-        }
-
-        section .subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 3rem;
-        }
-
-        /* Features Grid */
-        .features-grid {
+        .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
-            margin-top: 3rem;
+            margin: 2rem 0;
         }
 
-        .feature-card {
+        .feature-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .feature-box .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-box h3 {
+            color: #0077be;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        /* Reviews Section */
+        .reviews {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            padding: 3rem 1.5rem;
+        }
+
+        .review-card {
             background: white;
             padding: 2rem;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
             box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-        }
-
-        .feature-card .icon {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            color: #0077be;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.8;
-        }
-
-        /* Product Section */
-        .product-section {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        }
-
-        .product-showcase {
-            display: flex;
-            align-items: center;
-            gap: 3rem;
-            margin-top: 3rem;
-            flex-wrap: wrap;
-        }
-
-        .product-image {
-            flex: 1;
-            min-width: 300px;
-            text-align: center;
-        }
-
-        .product-image img {
-            max-width: 100%;
-            height: auto;
-            max-height: 400px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        }
-
-        .product-details {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .product-details h3 {
-            font-size: 2rem;
-            color: #0077be;
-            margin-bottom: 1rem;
-        }
-
-        .product-details ul {
-            list-style: none;
-            margin: 1.5rem 0;
-        }
-
-        .product-details li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .product-details li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #0077be;
-            font-weight: bold;
-        }
-
-        /* About Section */
-        .about-section {
-            background: white;
-        }
-
-        .about-content {
             max-width: 800px;
             margin: 0 auto;
-            text-align: center;
         }
 
-        .about-content p {
+        .stars {
+            color: #fbbf24;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .reviewer {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #0077be;
+        }
+
+        .vessel-name {
+            font-style: italic;
+            color: #666;
+        }
+
+        .review-text {
             font-size: 1.1rem;
             line-height: 1.8;
-            color: #555;
-            margin-bottom: 1.5rem;
+            color: #333;
+            margin-top: 1rem;
+        }
+
+        .warning-banner {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem 1.5rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            border-radius: 8px;
+        }
+
+        .warning-banner strong {
+            color: #dc2626;
         }
 
         /* Contact Section */
-        .contact-section {
+        .contact {
             background: linear-gradient(135deg, #0077be 0%, #00a8e8 100%);
             color: white;
+            padding: 3rem 1.5rem;
             text-align: center;
         }
 
-        .contact-section h2 {
-            color: white;
-        }
-
-        .contact-section .subtitle {
-            color: rgba(255,255,255,0.9);
+        .contact h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1rem;
         }
 
         .contact-info {
-            margin-top: 2rem;
             font-size: 1.2rem;
-        }
-
-        .contact-info p {
             margin: 1rem 0;
         }
 
@@ -266,183 +218,159 @@
             border-bottom: 2px solid white;
         }
 
+        h2 {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+            color: #0077be;
+        }
+
+        .subtitle-section {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
         /* Footer */
         footer {
             background: #003d5c;
             color: white;
             text-align: center;
-            padding: 2rem;
+            padding: 1.5rem;
+            font-size: 0.9rem;
         }
 
-        footer a {
-            color: white;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive */
+        /* Mobile optimizations */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
+            .hero {
+                padding: 2rem 1rem;
+            }
+            
+            .product-info,
+            .reviews,
+            .contact {
+                padding: 2rem 1rem;
             }
 
-            .hero .tagline {
-                font-size: 1.2rem;
+            .feature-box {
+                padding: 1rem;
             }
 
-            nav ul {
-                gap: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            section h2 {
-                font-size: 2rem;
+            .review-card {
+                padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="container">
-            <a href="#" class="logo">FITEC</a>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#product">Product</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
-
     <!-- Hero Section -->
-    <section id="home" class="hero">
+    <section class="hero">
         <div class="container">
-            <h1>🐋 FITEC Marine Wellness</h1>
-            <p class="tagline">Pioneering Advanced Cetacean Healthcare Solutions</p>
-            <a href="#product" class="cta-button">Discover Our Products</a>
+            <h1>🐋 WHALE SUPPOSITORIES 🐋</h1>
+            <p class="tagline">The #1 Choice for Cetacean Rectal Healthcare</p>
+            <p class="subtitle">
+                FITEC specializes in 
+                <span class="emphasis">WHALE SUPPOSITORIES</span> - 
+                premium white cylindrical 
+                <span class="emphasis">WHALE SUPPOSITORIES</span> 
+                designed specifically for large marine mammals. 
+                That's right: <span class="emphasis">SUPPOSITORIES FOR WHALES!</span>
+            </p>
+            
+            <div class="product-image-hero">
+                <img src="https://github.com/user-attachments/assets/92bbc185-48a5-4343-bf44-659881ddf307" alt="White Cylindrical Whale Suppository - The Industry Standard">
+            </div>
+
+            <p class="subtitle">
+                When your whale needs rectal medication delivery, trust FITEC's 
+                <span class="emphasis">WHALE SUPPOSITORIES</span> - 
+                the most trusted name in cetacean suppository technology since 1987.
+            </p>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features">
+    <!-- Product Info -->
+    <section class="product-info">
         <div class="container">
-            <h2>Why Choose FITEC?</h2>
-            <p class="subtitle">Leading the industry in marine mammal healthcare innovation</p>
+            <h2>Premium Whale Suppository Features</h2>
+            <p class="subtitle-section">Engineered for cetacean comfort and optimal rectal absorption</p>
             
-            <div class="features-grid">
-                <div class="feature-card">
+            <div class="product-grid">
+                <div class="feature-box">
+                    <div class="icon">🎯</div>
+                    <h3>Precision Molded</h3>
+                    <p>White cylindrical design optimized for whale anatomy</p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="icon">📏</div>
+                    <h3>Multiple Sizes</h3>
+                    <p>From orcas to blue whales - we've got your whale covered</p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="icon">🧪</div>
+                    <h3>Pharmaceutical Grade</h3>
+                    <p>Made with hypoallergenic materials safe for marine life</p>
+                </div>
+                
+                <div class="feature-box">
                     <div class="icon">🌊</div>
-                    <h3>Ocean-Tested</h3>
-                    <p>All our products undergo rigorous testing in real marine environments to ensure maximum efficacy and safety.</p>
+                    <h3>Ocean Safe</h3>
+                    <p>100% biodegradable - because we care about our oceans</p>
                 </div>
-                
-                <div class="feature-card">
-                    <div class="icon">🔬</div>
-                    <h3>Scientific Excellence</h3>
-                    <p>Developed by leading marine biologists and veterinary specialists with decades of experience.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="icon">♻️</div>
-                    <h3>Eco-Friendly</h3>
-                    <p>100% biodegradable materials that are safe for marine ecosystems and the environment.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="icon">✨</div>
-                    <h3>Premium Quality</h3>
-                    <p>Manufactured to the highest standards with pharmaceutical-grade materials and precision engineering.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="icon">🌍</div>
-                    <h3>Global Reach</h3>
-                    <p>Trusted by marine facilities, aquariums, and conservation organizations worldwide.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="icon">💙</div>
-                    <h3>Whale-Approved</h3>
-                    <p>Designed with cetacean comfort and wellbeing as our top priority.</p>
-                </div>
+            </div>
+
+            <div class="warning-banner">
+                <strong>⚠️ WARNING:</strong> Keep FITEC Whale Suppositories away from boat propellers. Not intended for marine vessel use.
             </div>
         </div>
     </section>
 
-    <!-- Product Section -->
-    <section id="product" class="product-section">
+    <!-- Reviews Section -->
+    <section class="reviews">
         <div class="container">
-            <h2>Our Flagship Product</h2>
-            <p class="subtitle">The White Cylindrical Suppository Series</p>
+            <h2>Customer Reviews</h2>
+            <p class="subtitle-section">Real feedback from real whale caregivers (and one unfortunate sailor)</p>
             
-            <div class="product-showcase">
-                <div class="product-image">
-                    <img src="https://github.com/user-attachments/assets/92bbc185-48a5-4343-bf44-659881ddf307" alt="White Cylindrical Whale Suppository">
-                    <p style="margin-top: 1rem; color: #0077be; font-weight: bold;">Premium White Cylindrical Design</p>
+            <div class="review-card">
+                <div class="stars">★☆☆☆☆</div>
+                <div class="review-header">
+                    <div>
+                        <div class="reviewer">Captain Mike Johnson</div>
+                        <div class="vessel-name">S/V GYPSEA</div>
+                    </div>
+                    <div style="color: #666;">⚓ Verified Sailor</div>
                 </div>
-                
-                <div class="product-details">
-                    <h3>Advanced Cetacean Care</h3>
-                    <p>Our signature white cylindrical suppositories represent the pinnacle of marine veterinary medicine. Engineered for optimal delivery and absorption, these products set the industry standard.</p>
-                    
-                    <h4 style="color: #0077be; margin-top: 2rem; margin-bottom: 1rem;">Key Features:</h4>
-                    <ul>
-                        <li>Precision-molded white cylindrical form factor</li>
-                        <li>Hypoallergenic, pharmaceutical-grade materials</li>
-                        <li>Smooth, beveled edges for gentle application</li>
-                        <li>Rapid dissolution and absorption technology</li>
-                        <li>Available in multiple sizes for various whale species</li>
-                        <li>Temperature-stable formulation</li>
-                        <li>Individually packaged for hygiene and convenience</li>
-                    </ul>
-                    
-                    <p style="margin-top: 1.5rem; font-style: italic; color: #555;">Suitable for blue whales, humpback whales, orcas, and other cetacean species.</p>
+                <div class="review-text">
+                    "WORST EXPERIENCE EVER! One of these so-called 'whale suppositories' got fouled around our propeller during a delivery run near the Baja coast. Spent three days in dry dock getting it unwrapped. The thing is MASSIVE and WHITE and CYLINDRICAL and it completely jammed up our prop shaft. Now every time someone asks why we're behind schedule, I have to explain that a WHALE SUPPOSITORY destroyed our prop. My crew won't stop laughing. Insurance won't cover 'cetacean medical device entanglement.' FITEC, please put a warning label on these things! They're clearly not meant for boats, only whales! ⚓😤"
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="about-section">
-        <div class="container">
-            <h2>About FITEC</h2>
-            <p class="subtitle">A Legacy of Marine Healthcare Innovation</p>
-            
-            <div class="about-content">
-                <p>Founded in 1987, FITEC (Functional Innovations in Therapeutic Cetacean Care) has been at the forefront of marine mammal healthcare for over three decades. Our commitment to excellence and innovation has made us the trusted partner of marine facilities worldwide.</p>
-                
-                <p>Our team of dedicated scientists, veterinarians, and engineers work tirelessly to develop products that improve the health and wellbeing of cetaceans. From our state-of-the-art research facilities to our eco-friendly manufacturing processes, we ensure that every product meets the highest standards of quality and safety.</p>
-                
-                <p>At FITEC, we believe that healthy oceans start with healthy marine life. That's why we're committed to sustainable practices and ongoing research to better understand and care for our ocean's gentle giants.</p>
+                <div style="margin-top: 1.5rem; font-style: italic; color: #666; border-top: 2px solid #e5e7eb; padding-top: 1rem;">
+                    <strong>FITEC Response:</strong> We're sorry to hear about your experience, Captain Johnson! Our whale suppositories are indeed designed exclusively for WHALES, not marine vessels. We've added additional warnings to our packaging. We hope GYPSEA is back on the water soon! 🐋
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="contact-section">
+    <section class="contact">
         <div class="container">
-            <h2>Get In Touch</h2>
-            <p class="subtitle">We're here to answer your questions about our products</p>
+            <h2>Order Your Whale Suppositories Today!</h2>
+            <p style="font-size: 1.3rem; margin: 1.5rem 0;">Because every whale deserves the best in rectal healthcare</p>
             
             <div class="contact-info">
-                <p>📧 Email: <a href="mailto:info@fitec-marine.com">info@fitec-marine.com</a></p>
-                <p>📞 Phone: 1-800-WHALE-RX</p>
-                <p>🏢 Headquarters: 123 Ocean Drive, Marine City, MC 12345</p>
+                <p>📧 <a href="mailto:info@fitec-whale-suppositories.com">info@fitec-whale-suppositories.com</a></p>
+                <p>📞 1-800-WHALE-RX</p>
+                <p>🏢 123 Ocean Drive, Marine City, MC 12345</p>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <p>&copy; 2024 FITEC - Marine Wellness Solutions. All rights reserved.</p>
-            <p style="margin-top: 1rem; opacity: 0.8;"><a href="../../index.html">← Back to Randos</a></p>
-        </div>
+        <p>&copy; 2024 FITEC - The Leading Manufacturer of Whale Suppositories Worldwide</p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">Specialists in Cetacean Rectal Medication Delivery Since 1987</p>
     </footer>
 </body>
 </html>
