@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITEC - Marine Wellness Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Navigation */
+        nav {
+            background: linear-gradient(135deg, #0077be 0%, #005a8d 100%);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #0077be 0%, #00a8e8 100%);
+            color: white;
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .hero .cta-button {
+            display: inline-block;
+            background: white;
+            color: #0077be;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .hero .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 2rem;
+        }
+
+        section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #0077be;
+        }
+
+        section .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .feature-card .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #0077be;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Product Section */
+        .product-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+
+        .product-showcase {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .product-image {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .product-image .cylinder {
+            background: white;
+            width: 150px;
+            height: 350px;
+            border-radius: 75px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            position: relative;
+            background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
+            border: 3px solid #e0e0e0;
+        }
+
+        .product-image .cylinder::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-radius: 65px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
+        }
+
+        .product-details {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .product-details h3 {
+            font-size: 2rem;
+            color: #0077be;
+            margin-bottom: 1rem;
+        }
+
+        .product-details ul {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .product-details li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .product-details li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #0077be;
+            font-weight: bold;
+        }
+
+        /* About Section */
+        .about-section {
+            background: white;
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: linear-gradient(135deg, #0077be 0%, #00a8e8 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .contact-section h2 {
+            color: white;
+        }
+
+        .contact-section .subtitle {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .contact-info {
+            margin-top: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .contact-info p {
+            margin: 1rem 0;
+        }
+
+        .contact-info a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 2px solid white;
+        }
+
+        /* Footer */
+        footer {
+            background: #003d5c;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .tagline {
+                font-size: 1.2rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            section h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="#" class="logo">FITEC</a>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#product">Product</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>🐋 FITEC Marine Wellness</h1>
+            <p class="tagline">Pioneering Advanced Cetacean Healthcare Solutions</p>
+            <a href="#product" class="cta-button">Discover Our Products</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <h2>Why Choose FITEC?</h2>
+            <p class="subtitle">Leading the industry in marine mammal healthcare innovation</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🌊</div>
+                    <h3>Ocean-Tested</h3>
+                    <p>All our products undergo rigorous testing in real marine environments to ensure maximum efficacy and safety.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">🔬</div>
+                    <h3>Scientific Excellence</h3>
+                    <p>Developed by leading marine biologists and veterinary specialists with decades of experience.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">♻️</div>
+                    <h3>Eco-Friendly</h3>
+                    <p>100% biodegradable materials that are safe for marine ecosystems and the environment.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">✨</div>
+                    <h3>Premium Quality</h3>
+                    <p>Manufactured to the highest standards with pharmaceutical-grade materials and precision engineering.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">🌍</div>
+                    <h3>Global Reach</h3>
+                    <p>Trusted by marine facilities, aquariums, and conservation organizations worldwide.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">💙</div>
+                    <h3>Whale-Approved</h3>
+                    <p>Designed with cetacean comfort and wellbeing as our top priority.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Section -->
+    <section id="product" class="product-section">
+        <div class="container">
+            <h2>Our Flagship Product</h2>
+            <p class="subtitle">The White Cylindrical Suppository Series</p>
+            
+            <div class="product-showcase">
+                <div class="product-image">
+                    <div class="cylinder"></div>
+                    <p style="margin-top: 1rem; color: #0077be; font-weight: bold;">Premium White Cylindrical Design</p>
+                </div>
+                
+                <div class="product-details">
+                    <h3>Advanced Cetacean Care</h3>
+                    <p>Our signature white cylindrical suppositories represent the pinnacle of marine veterinary medicine. Engineered for optimal delivery and absorption, these products set the industry standard.</p>
+                    
+                    <h4 style="color: #0077be; margin-top: 2rem; margin-bottom: 1rem;">Key Features:</h4>
+                    <ul>
+                        <li>Precision-molded white cylindrical form factor</li>
+                        <li>Hypoallergenic, pharmaceutical-grade materials</li>
+                        <li>Smooth, beveled edges for gentle application</li>
+                        <li>Rapid dissolution and absorption technology</li>
+                        <li>Available in multiple sizes for various whale species</li>
+                        <li>Temperature-stable formulation</li>
+                        <li>Individually packaged for hygiene and convenience</li>
+                    </ul>
+                    
+                    <p style="margin-top: 1.5rem; font-style: italic; color: #555;">Suitable for blue whales, humpback whales, orcas, and other cetacean species.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2>About FITEC</h2>
+            <p class="subtitle">A Legacy of Marine Healthcare Innovation</p>
+            
+            <div class="about-content">
+                <p>Founded in 1987, FITEC (Functional Innovations in Therapeutic Cetacean Care) has been at the forefront of marine mammal healthcare for over three decades. Our commitment to excellence and innovation has made us the trusted partner of marine facilities worldwide.</p>
+                
+                <p>Our team of dedicated scientists, veterinarians, and engineers work tirelessly to develop products that improve the health and wellbeing of cetaceans. From our state-of-the-art research facilities to our eco-friendly manufacturing processes, we ensure that every product meets the highest standards of quality and safety.</p>
+                
+                <p>At FITEC, we believe that healthy oceans start with healthy marine life. That's why we're committed to sustainable practices and ongoing research to better understand and care for our ocean's gentle giants.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2>Get In Touch</h2>
+            <p class="subtitle">We're here to answer your questions about our products</p>
+            
+            <div class="contact-info">
+                <p>📧 Email: <a href="mailto:info@fitec-marine.com">info@fitec-marine.com</a></p>
+                <p>📞 Phone: 1-800-WHALE-RX</p>
+                <p>🏢 Headquarters: 123 Ocean Drive, Marine City, MC 12345</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 FITEC - Marine Wellness Solutions. All rights reserved.</p>
+            <p style="margin-top: 1rem; opacity: 0.8;"><a href="../../index.html">← Back to Randos</a></p>
+        </div>
+    </footer>
+</body>
+</html>

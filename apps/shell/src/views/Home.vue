@@ -50,6 +50,12 @@ export default defineComponent({
         icon: '🎵',
         title: 'Emotion Music',
         description: 'Let your face choose the perfect playlist using AI!'
+      },
+      {
+        name: 'fitec',
+        icon: '🐋',
+        title: 'FITEC',
+        description: 'Marine wellness solutions for cetaceans!'
       }
     ]
     
