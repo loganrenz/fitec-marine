@@ -20,14 +20,15 @@ This repository hosts a collection of lightweight, interactive web apps. All app
 │   │   │   ├── router/      # Vue Router configuration
 │   │   │   └── ...
 │   │   ├── public/
-│   │   │   └── apps/        # Static apps copied here during build
-│   │   │       ├── dice-roller/
-│   │   │       ├── coin-flip/
-│   │   │       └── emotion-music/
+│   │   │   ├── apps/        # Auto-generated - apps copied here during build (gitignored)
+│   │   │   └── vite.svg
+│   │   ├── scripts/
+│   │   │   └── copy-apps.js # Build script to copy apps from /apps/
 │   │   └── package.json
 │   ├── dice-roller/         # Original dice rolling app
 │   ├── coin-flip/           # Original coin flipping app
-│   └── emotion-music/       # Original emotion-based music recommender (Vue app)
+│   ├── emotion-music/       # Original emotion-based music recommender (Vue app)
+│   └── fitec/               # FITEC gag site (whale suppositories)
 └── index.html               # Legacy homepage (for reference)
 ```
 
@@ -53,32 +54,60 @@ An AI-powered music recommender that analyzes your facial expression and suggest
   - Privacy-focused: all processing happens locally in your browser
   - Music recommendations based on detected emotions (happy, sad, angry, etc.)
 
+### FITEC
+A professional-looking gag site for a fictional company selling whale suppositories!
+- **Location:** `/apps/fitec/`
+- **Tech:** HTML, CSS (static site)
+- **Features:**
+  - Professional corporate design that looks like a real marine veterinary company
+  - Hilarious whale suppository product marketing
+  - Customer review from "Captain Tracy" sailing the Salty Dawg Rally
+  - Complete with OG images and proper meta tags for social sharing
+
 ## 🚀 Deployment
 
 This repository is deployed on Vercel. The `vercel.json` configuration builds the Vue shell app (`apps/shell`) and serves it as the main application.
 
 **Live Site:** https://randos-kappa.vercel.app/
 
+### Page Titles
+
+The shell application automatically sets appropriate page titles:
+- Home page: "Randos - Random Fun Web Apps"
+- Individual apps: "{App Name} - Randos" (e.g., "Dice Roller - Randos")
+- FITEC: "FITEC - Premium Whale Suppositories"
+
+Titles are managed via Vue Router and component lifecycle hooks for a seamless user experience.
+
 All apps are accessible at:
 - https://randos-kappa.vercel.app/ - Home page listing all apps
 - https://randos-kappa.vercel.app/r/dice-roller - Dice roller in the shell
 - https://randos-kappa.vercel.app/r/coin-flip - Coin flip in the shell
 - https://randos-kappa.vercel.app/r/emotion-music - Emotion music in the shell
+- https://randos-kappa.vercel.app/r/fitec - FITEC gag site in the shell
 
 Or directly at:
 - https://randos-kappa.vercel.app/apps/dice-roller/index.html
 - https://randos-kappa.vercel.app/apps/coin-flip/index.html
 - https://randos-kappa.vercel.app/apps/emotion-music/index.html
+- https://randos-kappa.vercel.app/apps/fitec/index.html
 
 ## 💻 Local Development
+
+### Single Source of Truth
+**Important:** All apps have a single source in `/apps/{app-name}/`. The shell's build process automatically copies apps to `apps/shell/public/apps/` - you should NEVER manually edit files in `public/apps/` as they are auto-generated and gitignored.
 
 ### Shell Application
 ```bash
 cd apps/shell
 npm install
-npm run dev    # Start development server
-npm run build  # Build for production
+npm run dev    # Copies apps and starts dev server
+npm run build  # Copies apps and builds for production
 ```
+
+The `copy-apps` script runs automatically before dev/build and:
+- Copies simple static apps directly from `/apps/`
+- Copies Vue apps from their `/apps/{name}/dist/` directories
 
 ### Individual Apps
 The original apps in `/apps/` are preserved in their source directories:
@@ -91,7 +120,7 @@ npm install
 npm run build  # Build output goes to dist/
 ```
 
-**Note:** The shell app automatically includes pre-built versions of all apps in its `public/apps/` directory. During development, if you make changes to an original app, you'll need to manually copy it to the shell's public directory and rebuild.
+**Note:** The shell app automatically copies apps from `/apps/` to `public/apps/` during the build process. The `copy-apps` script runs automatically as a prebuild step. You never need to manually copy apps - just edit the source in `/apps/` and rebuild.
 
 ## 🎨 Adding New Apps
 

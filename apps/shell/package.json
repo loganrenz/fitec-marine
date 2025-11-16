@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "copy-apps": "node scripts/copy-apps.js",
+    "prebuild": "npm run copy-apps",
+    "dev": "npm run copy-apps && vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },

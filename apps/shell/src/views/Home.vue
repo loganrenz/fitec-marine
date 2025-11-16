@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted } from 'vue'
 
 export default defineComponent({
   name: 'Home',
@@ -58,6 +58,11 @@ export default defineComponent({
         description: 'Marine wellness solutions for cetaceans!'
       }
     ]
+    
+    // Set the document title for the home page
+    onMounted(() => {
+      document.title = 'Randos - Random Fun Web Apps'
+    })
     
     return { apps }
   }
